@@ -24,10 +24,15 @@ Proof of correctness : (Placeholder for overleaf document)
 
 Sanity_check uses this method to integrate the constant funtion 1 and so estimate the number of pentominos.
 '''
-
 import networkx as nx
 import random
 import copy
+import numpy as np
+import scipy.linalg
+from scipy.sparse import csc_matrix
+import scipy
+from scipy import array, linalg, dot
+from aux_tools import log_number_trees, cut_edges
 
 def nw_most(nodes):
     #returns the nw_most from among the nodes; that is,the element which is largest in the North/South x West/East lexicographic order.
@@ -118,7 +123,7 @@ class pentomino_object:
             return
         choice = random.choice(valid_candidates)
         
-        self.node_history.append(copy.deepcopy(self.nodes))
+        #self.node_history.append(copy.deepcopy(self.nodes))
         self.degree_history.append(self.degree)
         self.nodes.add(choice)
         
@@ -188,9 +193,20 @@ def integrate(function, torus, size, trials = 10):
 def constant_one(pentomino):
     return 1
 
-def cut(pentomino, power = 1):
+def cut(pentomino):
     block = { covering_map(p, pentomino.torus.graph["size"]) for p in pentomino.nodes}
-    return nx.cut_size(pentomino.torus, block)**power
+    return nx.cut_size(pentomino.torus, block)**pentomino.power
+
+    
+def tree_compactness(pentomino):
+    block = { covering_map(p, pentomino.torus.graph["size"]) for p in pentomino.nodes}
+    complementary_block = set(pentomino.torus.nodes).difference(block)
+    G_A = nx.subgraph(pentomino.torus, block)
+    G_B = nx.subgraph(pentomino.torus, complementary_block)
+    T_A = log_number_trees(G_A)
+    T_B = log_number_trees(G_B)
+    cutsize = len(cut_edges(pentomino.torus, block, complementary_block))
+    return np.exp(T_A + T_B)*cutsize
 
 #Tests
 
@@ -212,19 +228,46 @@ def sanity_check(n = 10, size = 5, num_samples = 1000):
     counter
 
 
-def cutsize(n = 10, size = "half", power = 1, num_samples = 10, trials = 10):
+def cutsize(n = 10, power = 1,size = "half", num_samples = 100, trials = 3):
     if size == "half":
         size = n**2 / 2
     torus = create_torus(n)
     tests = []
     for i in range(trials):
         samples = make_samples(torus, size, num_samples)
+        for p in samples:
+            p.power = power
+            print(p.likelihood)
         print( " Succesfully built ", len(samples), "Pentominos")
         tests.append(integrate_from_samples(cut, samples) / integrate_from_samples(constant_one, samples))
     print(tests)
     
-#cutsize(4)
+def tree_compactness_integration(n = 10, power = 1,size = "half", num_samples = 1000, trials = 3):
+    if size == "half":
+        size = n**2 / 2
+    torus = create_torus(n)
+    tests = []
+    for i in range(trials):
+        samples = make_samples(torus, size, num_samples)
+        for p in samples:
+            p.power = power
+            print(p.likelihood())
+        print( " Succesfully built ", len(samples), "Pentominos")
+        tests.append(integrate_from_samples(tree_compactness, samples) / integrate_from_samples(constant_one, samples))
+    print(tests)
+    
+tree_compactness_integration(4)
+    
+#cutsize(4,2)
 #m =6 
 #pents = make_samples(create_torus(m), (m**2)/2,1)
 #[p.stuck for p in pents]
+#
 #p = generate_tiling(create_torus(6), 18)
+#tree_compactness(p)
+
+###Moments:
+    
+'''The purpose of the code here is to estimate a distribution by computing the moments'''
+
+#accurate_count = 
