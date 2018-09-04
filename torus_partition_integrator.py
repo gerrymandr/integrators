@@ -32,17 +32,7 @@ import scipy.linalg
 from scipy.sparse import csc_matrix
 import scipy
 from scipy import array, linalg, dot
-from aux_tools import log_number_trees, cut_edges
-
-def nw_most(nodes):
-    #returns the nw_most from among the nodes; that is,the element which is largest in the North/South x West/East lexicographic order.
-    y_max = max( [node[1] for node in nodes])
-    y_maximizers = [ node for node in nodes if node[1] == y_max]
-    west_most = y_maximizers[0][0]
-    for node in y_maximizers:
-        if node[0] < west_most:
-            west_most = node[0]
-    return (west_most, y_max)
+from aux_tools import log_number_trees, cut_edges, nw_most
 
 class pentomino_object:
     def __init__(self, torus, root = False):

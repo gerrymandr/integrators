@@ -59,3 +59,15 @@ def cut_edges(graph, subgraph_1, subgraph_2):
         if e[0] in subgraph_2 and e[1] in subgraph_1:
             list_of_cut_edges.append(e)
     return list_of_cut_edges
+
+#Geometry:
+    
+def nw_most(nodes):
+#returns the nw_most from among the nodes; that is,the element which is largest in the North/South x West/East lexicographic order.
+    y_max = max( [node[1] for node in nodes])
+    y_maximizers = [ node for node in nodes if node[1] == y_max]
+    west_most = y_maximizers[0][0]
+    for node in y_maximizers:
+        if node[0] < west_most:
+            west_most = node[0]
+    return (west_most, y_max)
