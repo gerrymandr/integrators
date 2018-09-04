@@ -177,9 +177,9 @@ def integrate_from_samples(function, samples):
         sum += function(pentomino) / pentomino.likelihood()
     return sum / len(samples)
 
-def make_samples(torus, size, trials = 10):
+def make_samples(torus, size, num_samples = 10):
     samples = []
-    for i in range(trials):
+    for i in range(num_samples):
         pentomino = generate_tiling(torus, size)
         if pentomino.stuck == False:
             samples.append(pentomino)
@@ -264,21 +264,23 @@ def estimate_expectation(function, n = 10, power = 1,size = "half", num_samples 
     tests = []
     all_samples = []
     samples_set = []
+    likelihoods = []
     for i in range(trials):
         samples = make_samples(torus, size, num_samples)
         samples_set.append(samples)
         for p in samples:
             p.power = power
-            print(p.likelihood())
+            likelihoods.append(p.likelihood())
             all_samples.append(p)
         print( " Succesfully built ", len(samples), "Pentominos")
     estimated_sample_space_size = integrate_from_samples(constant_one, all_samples)
     print("space estimate at size: ", estimated_sample_space_size)
+    print("add something here that uses the entropy likelihoods to guess at accuracy...")
     for samples in samples_set:
         tests.append(integrate_from_samples(function, samples) /estimated_sample_space_size)
     print(tests)
     
-estimate_expectation(log_tree_compactness, 4, 1, 8, 300,2)
+estimate_expectation(log_tree_compactness, 4, 1, 8, 150,2)
     
 #cutsize(4,2)
 #m =6 
