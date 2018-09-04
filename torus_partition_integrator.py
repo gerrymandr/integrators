@@ -50,6 +50,7 @@ class pentomino_object:
         self.node_history = []
         self.degree_history = []
         self.stuck = False
+        self.power = 1
         if root == False:
             self.degree_history.append(torus.graph["size"]**2)
             self.initialize_root()
@@ -174,7 +175,7 @@ def integrate_from_samples(function, samples):
     '''samples is a collection of pentominos'''
     sum = 0
     for pentomino in samples:
-        sum += function(pentomino) / pentomino.likelihood()
+        sum += function(pentomino)**pentomino.power / pentomino.likelihood()
     return sum / len(samples)
 
 def make_samples(torus, size, num_samples = 10):
@@ -294,3 +295,39 @@ estimate_expectation(log_tree_compactness, 4, 1, 8, 150,2)
     
 '''The purpose of the code here is to estimate a distribution by computing the moments'''
 
+def moments(function, n = 10, power = 1,size = "half", num_samples = 100, trials = 3):
+    
+    '''
+    Return estimates of E[ function^powr] for powr in range(1, power + 1)
+    
+    '''
+    if size == "half":
+        size = n**2 / 2
+    torus = create_torus(n)
+    moments = []
+    all_samples = []
+    samples_set = []
+    likelihoods = []
+    for i in range(trials):
+        samples = make_samples(torus, size, num_samples)
+        samples_set.append(samples)
+        for p in samples:
+            p.power = power
+            likelihoods.append(p.likelihood())
+            all_samples.append(p)
+        print( " Succesfully built ", len(samples), "Pentominos")
+    estimated_sample_space_size = integrate_from_samples(constant_one, all_samples)
+    print("space estimate at size: ", estimated_sample_space_size)
+    print("add something here that uses the entropy likelihoods to guess at accuracy...")
+    for powr in range(1,power+1):
+        tests = []
+        for samples in samples_set:
+            for p in samples:
+                p.power = powr
+            tests.append(integrate_from_samples(function, samples) /estimated_sample_space_size)
+        moments.append(tests)
+    print(moments)
+    return moments
+
+moments(log_tree_compactness, 4, 3, 8, 100,2)
+    
