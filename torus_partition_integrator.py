@@ -6,7 +6,7 @@ Created on Mon Sep  3 19:14:25 2018
 
 ''' 
 
-Inspired by Brendan McKays answer to math overflow: "How to sample a uniform random polyomino"
+Inspired by Brendan McKays answer to math overflow: "How to sample a uniform random polyomino" https://mathoverflow.net/a/244536/41873
 
 This uses importance sampling to estimate the integral of a function over the space of partitions of a torus into two components.
 
@@ -223,7 +223,7 @@ def cutsize(n = 10, size = "half", power = 1, num_samples = 10, trials = 10):
         tests.append(integrate_from_samples(cut, samples) / integrate_from_samples(constant_one, samples))
     print(tests)
     
-cutsize(4)
+#cutsize(4)
 #m =6 
 #pents = make_samples(create_torus(m), (m**2)/2,1)
 #[p.stuck for p in pents]
