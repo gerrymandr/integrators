@@ -8,7 +8,7 @@ Created on Mon Sep  3 19:14:25 2018
 
 Inspired by Brendan McKays answer to math overflow: "How to sample a uniform random polyomino" https://mathoverflow.net/a/244536/41873
 
-This uses importance sampling to estimate the integral of a function over the space of partitions of a torus into two components.
+This uses importance sampling to estimate the integral of a function over the space of partitions of a torus into two connected subgraphs.
 
 To run it, write a function your_function as in example functions
 
@@ -22,7 +22,7 @@ integrate_from_samples(your_function, samples)
 
 Proof of correctness : (Placeholder for overleaf document)
 
-Sanity_check uses this method to integrate the constant funtion 1 and so determine the number of pentominos.
+Sanity_check uses this method to integrate the constant funtion 1 and so estimate the number of pentominos.
 '''
 
 import networkx as nx
