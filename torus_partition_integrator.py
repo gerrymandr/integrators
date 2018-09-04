@@ -208,6 +208,16 @@ def tree_compactness(pentomino):
     cutsize = len(cut_edges(pentomino.torus, block, complementary_block))
     return np.exp(T_A + T_B)*cutsize
 
+def log_tree_compactness(pentomino):
+    block = { covering_map(p, pentomino.torus.graph["size"]) for p in pentomino.nodes}
+    complementary_block = set(pentomino.torus.nodes).difference(block)
+    G_A = nx.subgraph(pentomino.torus, block)
+    G_B = nx.subgraph(pentomino.torus, complementary_block)
+    T_A = log_number_trees(G_A)
+    T_B = log_number_trees(G_B)
+    cutsize = len(cut_edges(pentomino.torus, block, complementary_block))
+    return T_A + T_B + np.log(cutsize)
+
 #Tests
 
 def sanity_check(n = 10, size = 5, num_samples = 1000):
@@ -242,21 +252,33 @@ def cutsize(n = 10, power = 1,size = "half", num_samples = 100, trials = 3):
         tests.append(integrate_from_samples(cut, samples) / integrate_from_samples(constant_one, samples))
     print(tests)
     
-def tree_compactness_integration(n = 10, power = 1,size = "half", num_samples = 1000, trials = 3):
+def estimate_expectation(function, n = 10, power = 1,size = "half", num_samples = 100, trials = 3):
+    
+    '''
+    Estimate E[ function^power]
+    
+    '''
     if size == "half":
         size = n**2 / 2
     torus = create_torus(n)
     tests = []
+    all_samples = []
+    samples_set = []
     for i in range(trials):
         samples = make_samples(torus, size, num_samples)
+        samples_set.append(samples)
         for p in samples:
             p.power = power
             print(p.likelihood())
+            all_samples.append(p)
         print( " Succesfully built ", len(samples), "Pentominos")
-        tests.append(integrate_from_samples(tree_compactness, samples) / integrate_from_samples(constant_one, samples))
+    estimated_sample_space_size = integrate_from_samples(constant_one, all_samples)
+    print("space estimate at size: ", estimated_sample_space_size)
+    for samples in samples_set:
+        tests.append(integrate_from_samples(function, samples) /estimated_sample_space_size)
     print(tests)
     
-tree_compactness_integration(4)
+estimate_expectation(log_tree_compactness, 4, 1, 8, 300,2)
     
 #cutsize(4,2)
 #m =6 
@@ -270,4 +292,3 @@ tree_compactness_integration(4)
     
 '''The purpose of the code here is to estimate a distribution by computing the moments'''
 
-#accurate_count = 
