@@ -57,7 +57,7 @@ class pentomino_object:
     
     def get_candidates(self):
         '''returns the set of blocks that make pentomino when added, so that the parent of that pentomino is  the current pentomino '''
-        
+        #TODO: This can be sped up by just looking at adding blocks on the top two levels.
         balls = { frozenset({ (x[0] - 1, x[1]), (x[0] + 1, x[1]), (x[0], x[1]-1), (x[0], x[1] +1)}) for x in self.nodes }
         ball = set().union(*balls)
         boundary = ball.difference(self.nodes)
@@ -71,7 +71,6 @@ class pentomino_object:
     
     def get_admissible_nodes(self):
         #returns the nodes in the pentomino that can be removed without disconnecting it
-        #Can speed up by looking at boundary
         admissible = []
         for node in self.nodes:
             self.nodes.remove(node)
@@ -84,6 +83,7 @@ class pentomino_object:
         return admissible
     
     def get_northwestmost_legal(self):
+        #TODO This can be sped up by iterating through the nodes from in nw order, and checking along the way if it is admissible
         admissible = self.get_admissible_nodes()
         return nw_most(admissible)
     
@@ -121,6 +121,7 @@ class pentomino_object:
     def likelihood(self):
         product = 1
         for d in self.degree_history:
+moments(log_tree_compactness, 4, 3, 8, 3000,3)
             product = product * d
         return 1 / product
         
@@ -243,6 +244,7 @@ def cutsize(n = 10, power = 1,size = "half", num_samples = 100, trials = 3):
             p.power = power
             print(p.likelihood)
         print( " Succesfully built ", len(samples), "Pentominos")
+        print( "Warn that unless this is the same this might introduce some bias - so make it the same...")
         tests.append(integrate_from_samples(cut, samples) / integrate_from_samples(constant_one, samples))
     print(tests)
     
