@@ -174,10 +174,14 @@ def integrate_from_samples(function, samples):
 
 def make_samples(torus, size, num_samples = 10):
     samples = []
-    for i in range(num_samples):
+    i = 0
+    while i < num_samples:
         pentomino = generate_tiling(torus, size)
         if pentomino.stuck == False:
             samples.append(pentomino)
+            i += 1
+        else:
+            print("got stuck")
     return samples
 
 def integrate(function, torus, size, trials = 10):
